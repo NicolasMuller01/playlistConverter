@@ -1,12 +1,29 @@
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+config = {
+  "installed": {
+    "client_id": os.getenv('CLIENT_ID'),
+    "project_id": os.getenv('PROJECT_ID'),
+    "auth_uri": os.getenv('AUTH_URI'),
+    "token_uri": os.getenv('TOKEN_URI'),
+    "auth_provider_x509_cert_url": os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
+    "client_secret": os.getenv('CLIENT_SECRET'),
+    "redirect_uris": [os.getenv('REDIRECT_URIS')]
+  }
+}
+
 # Define los alcances para la API de YouTube Data
 SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 
 def create_youtube_playlist(video_ids):
     # Carga las credenciales
-    flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+    flow = InstalledAppFlow.from_client_config(config, SCOPES)
     credentials = flow.run_local_server()
 
     # Construye el servicio de YouTube
@@ -16,7 +33,7 @@ def create_youtube_playlist(video_ids):
     video_info = youtube_service.videos().list(part="snippet", id=video_ids[0]).execute()
 
     # Genera automáticamente un nombre para la playlist
-    playlist_name = f"{"palylist automatica"} Playlist"
+    playlist_name = f"{'palylist automatica'} Playlist"
 
     # Crea una nueva playlist en YouTube
     new_playlist = youtube_service.playlists().insert(

@@ -3,10 +3,17 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from youtubesearchpython import Search
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
+from dotenv import load_dotenv
+import os
+
 
 def extract_playlist_info(playlist_url):
+    load_dotenv()
     # Autenticación
-    client_credentials_manager = SpotifyClientCredentials(client_id='db6cbb3fda2d41029e68a2fdd6df6b2f', client_secret='9e52c28e1daa4e48a946e609b13277a5')
+    spotify_client_id = os.getenv('SPOTIFY_CLIENT_ID')
+    spotify_client_secret = os.getenv('SPOTIFY_CLIENT_SECRET')
+
+    client_credentials_manager = SpotifyClientCredentials(client_id=spotify_client_id, client_secret=spotify_client_secret)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
     # Extraer ID de la playlist desde la URL
@@ -53,8 +60,19 @@ def search_youtube_videos(tracks):
 SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 
 def create_youtube_playlist(video_ids):
+    config = {
+        "installed": {
+            "client_id": os.getenv('CLIENT_ID'),
+            "project_id": os.getenv('PROJECT_ID'),
+            "auth_uri": os.getenv('AUTH_URI'),
+            "token_uri": os.getenv('TOKEN_URI'),
+            "auth_provider_x509_cert_url": os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
+            "client_secret": os.getenv('CLIENT_SECRET'),
+            "redirect_uris": [os.getenv('REDIRECT_URIS')]
+        }
+    }
     # Carga las credenciales
-    flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+    flow = InstalledAppFlow.from_client_config(config, SCOPES)
     credentials = flow.run_local_server()
 
     # Construye el servicio de YouTube
